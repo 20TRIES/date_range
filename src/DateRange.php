@@ -316,12 +316,23 @@ class DateRange
 
         // Check if time period is a DAY
         $day = $this->spans(self::DAY);
-        if (!is_null($day))
+
+        if ( ! is_null($day))
         {
-            if ($day->copy()->startOfDay()->eq(Carbon::now('GB')->startOfDay()))
+            if ($day->copy()->startOfDay()->eq(Carbon::today('GB')))
             {
                 // If date is in current week
                 return 'Today';
+            }
+            elseif ($day->copy()->startOfDay()->eq(Carbon::tomorrow('GB')))
+            {
+                // If date is in current week
+                return 'Tomorrow';
+            }
+            elseif ($day->copy()->startOfDay()->eq(Carbon::yesterday('GB')))
+            {
+                // If date is in current week
+                return 'Yesterday';
             }
             elseif ($day->copy()->startOfWeek()->eq(Carbon::now('GB')->startOfWeek()))
             {
