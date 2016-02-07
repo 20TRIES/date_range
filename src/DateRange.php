@@ -306,6 +306,14 @@ class DateRange
 
     /**
      * Gets a human readable format for a date range.
+     *
+     * @TODO Add support for "inverted" date ranges
+     * @TODO Add support for "open ended" date ranges
+     * @TODO Add support for "open started" date ranges
+     * @TODO Add support for different timezones
+     *
+     * @param string $glue
+     * @return string
      */
     public function forHumans($glue = ' to ')
     {
@@ -517,6 +525,8 @@ class DateRange
      *
      * @TODO Doesn't support open started or open ended ranges.
      * @TODO Doesn't support non-intersecting ranges.
+     *
+     * @TODO Look at the possibility of implementing an "inersect" method instead.
      */
     public static function combine(array $ranges)
     {
@@ -808,76 +818,11 @@ class DateRange
      */
     public function toInclusiveString($date_format = 'l jS \\of F Y', $glue = ' to ')
     {
-        // @TODO This functionality should be moved into the forHumans() method
-//        if($this->isBounded())
-//        {
-//            $inverted = new static($this->before, $this->after);
-//
-//            return "Not " . $inverted->forHumans();
-//        }
-//        elseif ($this->isOpenEnded())
-//        {
-//            // @TODO Add support for end of (beginning of next)
-//                // @TODO Day
-//                // @TODO Week
-//                // @TODO Month
-//                // @TODO Year
-//
-//            // @TODO Append year if not current
-//
-//            // Check if time period is open ended
-//            return 'After ' . $this->after->copy()->addSecond()->format($date_format);
-//        }
-//        elseif ($this->isOpenStarted())
-//        {
-//            // If time period is open started
-//
-//            // @TODO Append year if not current
-//
-//            // @TODO Document why reverse
-//
-//            foreach(array_reverse(array_keys(self::$time_periods)) AS $timeperiod)
-//            {
-//                $start_method = "startOf$timeperiod";
-//
-//                $add_method = "add$timeperiod";
-//
-//                $sub_method = "sub$timeperiod";
-//
-//                if($this->before->copy()->$start_method()->eq($this->before))
-//                {
-//                    if($this->before->copy()->$start_method()->eq($this->before) && $this->before->copy()->eq(Carbon::now('GB')->$start_method()))
-//                    {
-//                        $date = "Current $timeperiod";
-//                    }
-//                    elseif($this->before->copy()->$start_method()->eq($this->before) && $this->before->copy()->eq(Carbon::now('GB')->$start_method()->$sub_method()))
-//                    {
-//                        $date = "Last $timeperiod";
-//                    }
-//                    elseif($this->before->copy()->$start_method()->eq($this->before) && $this->before->copy()->eq(Carbon::now('GB')->$start_method()->$add_method()))
-//                    {
-//                        $date = "Next $timeperiod";
-//                    }
-//                    else
-//                    {
-//                        $date = $this->before->format($this->timeperiod_formats[$timeperiod]);
-//                    }
-//                    return 'Before ' . $date;
-//                }
-//            }
-//
-//            return 'Before ' . $this->before->copy()->subSecond()->format($date_format);
-//        }
-//        else
-//        {
-//            // Return full date range
-//            return $this->after->copy()->addSecond()->format($date_format) . $glue . $this->before->copy()->subSecond()->format($date_format);
-//        }
-
         // Return full date range
         if(is_null($this->getAfter())){
             return 'Before '.$this->getBefore()->subSecond()->format($date_format);
         }
+
         if(is_null($this->getBefore())){
             return 'After '.$this->getAfter()->subSecond()->format($date_format);
         }
