@@ -1,16 +1,12 @@
-# Value Objects
+# Date Range
 
-A collection of Value Objects.
+A package for handling date ranges.
 
 ## Install
 
 Via Composer
 
 ``` bash
-$ composer require 20tries/value-objects
+composer require 20tries/date_range
 ```
 
-
-## License
-
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
