@@ -15,12 +15,12 @@
     },
     "autoload": {
         "psr-4": {
-            "_20TRIES\\DateRange\\": "src"
+            "_20TRIES\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "_20TRIES\\DateRange\\Test\\": "tests"
+            "_20TRIES\\Test\\": "tests"
         }
     },
     "scripts": {

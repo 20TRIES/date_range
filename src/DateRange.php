@@ -1,4 +1,4 @@
-<?php namespace _20TRIES\DateRange;
+<?php namespace _20TRIES;
 
 use Carbon\Carbon;
 
