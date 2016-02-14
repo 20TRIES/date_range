@@ -8,7 +8,7 @@ use Carbon\Carbon;
  * An object for storing and accessing a date range.
  *
  * @package App\libraries\ValueObjects
- * @since   0.1
+ * @since   v0
  * @author  Marcus T <marcust261@icloud.com>
  */
 class DateRange
