@@ -270,6 +270,7 @@ class DateRange
      * @param int year
      * @param int month
      * @param string timezone
+     * 
      * @return DateRange
      */
     public static function forMonth($year, $month, $timezone = null)
