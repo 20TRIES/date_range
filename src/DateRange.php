@@ -1,4 +1,6 @@
-<?php namespace _20TRIES;
+<?php
+
+namespace _20TRIES;
 
 use _20TRIES\Exceptions\DateRangeException;
 use _20TRIES\Exceptions\TimezoneException;
@@ -7,8 +9,8 @@ use Carbon\Carbon;
 /**
  * An object for storing and accessing a date range.
  *
- * @package App\libraries\ValueObjects
  * @since   v0
+ *
  * @author  Marcus T <marcust261@icloud.com>
  */
 class DateRange
@@ -81,26 +83,22 @@ class DateRange
      * @param Carbon|null $after
      * @param Carbon|null $before
      * @param null|string $name
+     *
      * @throws TimezoneException|DateRangeException
      */
     public function __construct(Carbon $after = null, Carbon $before = null, $name = null)
     {
         $this->name = $name;
 
-        if(is_null($after) && is_null($before))
-        {
+        if (is_null($after) && is_null($before)) {
             throw new DateRangeException('Either an after date or before date must be provided.');
-        }
-        elseif(is_null($after))
-        {
+        } elseif (is_null($after)) {
             $this->timezone = $before->getTimezone();
 
             $this->after = null;
 
             $this->before = $before;
-        }
-        else
-        {
+        } else {
             $this->after = $after;
 
             $this->timezone = $this->after->getTimezone();
@@ -109,8 +107,7 @@ class DateRange
 
             $before_tz = is_null($this->before->getTimezone()) ? null : $this->before->getTimezone();
 
-            if($before_tz->getName() !== $this->timezone->getName())
-            {
+            if ($before_tz->getName() !== $this->timezone->getName()) {
                 throw new TimezoneException('Multiple timezones are not supported.');
             }
         }
@@ -141,6 +138,7 @@ class DateRange
      *
      * @param Carbon $from
      * @param Carbon $to
+     *
      * @return static
      */
     public static function between(Carbon $from, Carbon $to)
@@ -152,9 +150,10 @@ class DateRange
      * Creates a date range that spans tomorrow.
      *
      * @param string $tz
+     *
      * @return DateRange
      */
-    public static function tomorrow($tz = null)
+    public static function tomorrow($tz = 'GB')
     {
         return static::between(Carbon::now($tz)->addDay()->startOfDay(), Carbon::now($tz)->addDay()->endOfDay());
     }
@@ -163,9 +162,10 @@ class DateRange
      * Creates a date range that spans today.
      *
      * @param string $tz
+     *
      * @return DateRange
      */
-    public static function today($tz = null)
+    public static function today($tz = 'GB')
     {
         return static::between(Carbon::now($tz)->startOfDay(), Carbon::now($tz)->endOfDay());
     }
@@ -174,9 +174,10 @@ class DateRange
      * Creates a date range that spans yesterday.
      *
      * @param string $tz
+     *
      * @return DateRange
      */
-    public static function yesterday($tz = null)
+    public static function yesterday($tz = 'GB')
     {
         return static::between(Carbon::now($tz)->subDay()->startOfDay(), Carbon::now($tz)->subDay()->endOfDay());
     }
@@ -185,9 +186,10 @@ class DateRange
      * Creates a date range that spans next week.
      *
      * @param string $tz
+     *
      * @return DateRange
      */
-    public static function nextWeek($tz = null)
+    public static function nextWeek($tz = 'GB')
     {
         return static::between(Carbon::now($tz)->addWeek()->startOfWeek(), Carbon::now($tz)->addWeek()->endOfWeek());
     }
@@ -196,9 +198,10 @@ class DateRange
      * Creates a date range that spans this week.
      *
      * @param string $tz
+     *
      * @return DateRange
      */
-    public static function thisWeek($tz = null)
+    public static function thisWeek($tz = 'GB')
     {
         return static::between(Carbon::now($tz)->startOfWeek(), Carbon::now($tz)->endOfWeek());
     }
@@ -207,9 +210,10 @@ class DateRange
      * Creates a date range that spans the last week.
      *
      * @param string $tz
+     *
      * @return DateRange
      */
-    public static function lastWeek($tz = null)
+    public static function lastWeek($tz = 'GB')
     {
         return static::between(Carbon::now($tz)->subWeek()->startOfWeek(), Carbon::now($tz)->subWeek()->endOfWeek());
     }
@@ -218,9 +222,10 @@ class DateRange
      * Creates a date range that spans next month.
      *
      * @param string $tz
+     *
      * @return static
      */
-    public static function nextMonth($tz = null)
+    public static function nextMonth($tz = 'GB')
     {
         return static::between(
             Carbon::now($tz)->startOfMonth()->addMonth(),
@@ -234,9 +239,10 @@ class DateRange
      * Creates a date range that spans this month.
      *
      * @param string $tz
+     *
      * @return static
      */
-    public static function thisMonth($tz = null)
+    public static function thisMonth($tz = 'GB')
     {
         return static::between(Carbon::now($tz)->startOfMonth(), Carbon::now($tz)->endOfMonth());
     }
@@ -245,9 +251,10 @@ class DateRange
      * Creates a date range that spans last month.
      *
      * @param string $tz
+     *
      * @return static
      */
-    public static function lastMonth($tz = null)
+    public static function lastMonth($tz = 'GB')
     {
         return static::between(
             Carbon::now($tz)->startOfMonth()->subMonth(),
@@ -264,9 +271,10 @@ class DateRange
      * @param string $format
      * @param string $time
      * @param string $tz
+     *
      * @return DateRange
      */
-    public static function forMonth($format, $time, $tz = null)
+    public static function forMonth($format, $time, $tz = 'GB')
     {
         return static::between(
             Carbon::createFromFormat($format, $time, $tz)->startOfMonth(),
@@ -280,9 +288,10 @@ class DateRange
      * Creates a date range that spans next year.
      *
      * @param string $tz
+     *
      * @return static
      */
-    public static function nextYear($tz = null)
+    public static function nextYear($tz = 'GB')
     {
         return static::between(
             Carbon::now($tz)->startOfYear()->addYear(),
@@ -296,9 +305,10 @@ class DateRange
      * Creates a date range that spans this year.
      *
      * @param string $tz
+     *
      * @return static
      */
-    public static function thisYear($tz = null)
+    public static function thisYear($tz = 'GB')
     {
         return static::between(Carbon::now($tz)->startOfYear(), Carbon::now($tz)->endOfYear());
     }
@@ -307,9 +317,10 @@ class DateRange
      * Creates a date range that spans last year.
      *
      * @param string $tz
+     *
      * @return static
      */
-    public static function lastYear($tz = null)
+    public static function lastYear($tz = 'GB')
     {
         return static::between(
             Carbon::now($tz)->startOfYear()->subYear(),
@@ -321,6 +332,7 @@ class DateRange
 
     /**
      * Gets the name for a date range (if set).
+     *
      * @return string|null
      */
     public function getName()
@@ -330,6 +342,7 @@ class DateRange
 
     /**
      * Gets the after date of a date range.
+     *
      * @return Carbon
      */
     public function getAfter()
@@ -339,6 +352,7 @@ class DateRange
 
     /**
      * Gets the before date of a date range.
+     *
      * @return Carbon
      */
     public function getBefore()
@@ -355,102 +369,75 @@ class DateRange
      * @TODO Add support for different timezones
      *
      * @param string $glue
+     *
      * @return string
      */
     public function forHumans($glue = ' to ')
     {
-        if( ! $this->isBounded())
-        {
+        if (!$this->isBounded()) {
             return $this->toInclusiveString('l jS \of F Y', $glue);
         }
 
         // Check if time period is a DAY
         $day = $this->spans(self::DAY);
 
-        if ( ! is_null($day))
-        {
-            if ($day->copy()->startOfDay()->eq(Carbon::today($this->timezone)))
-            {
+        if (!is_null($day)) {
+            if ($day->copy()->startOfDay()->eq(Carbon::today($this->timezone))) {
                 // If date is in current week
                 return 'Today';
-            }
-            elseif ($day->copy()->startOfDay()->eq(Carbon::tomorrow($this->timezone)))
-            {
+            } elseif ($day->copy()->startOfDay()->eq(Carbon::tomorrow($this->timezone))) {
                 // If date is in current week
                 return 'Tomorrow';
-            }
-            elseif ($day->copy()->startOfDay()->eq(Carbon::yesterday($this->timezone)))
-            {
+            } elseif ($day->copy()->startOfDay()->eq(Carbon::yesterday($this->timezone))) {
                 // If date is in current week
                 return 'Yesterday';
-            }
-            elseif ($day->copy()->startOfWeek()->eq(Carbon::now($this->timezone)->startOfWeek()))
-            {
+            } elseif ($day->copy()->startOfWeek()->eq(Carbon::now($this->timezone)->startOfWeek())) {
                 // If date is in current week
-                return 'On ' . $day->format('l');
-            }
-            elseif ($day->copy()->startOfWeek()->eq(Carbon::now($this->timezone)->subWeek()->startOfWeek()))
-            {
+                return 'On '.$day->format('l');
+            } elseif ($day->copy()->startOfWeek()->eq(Carbon::now($this->timezone)->subWeek()->startOfWeek())) {
                 // If date is in the week previous
-                return 'Last ' . $day->format('l');
-            }
-            elseif ($day->copy()->startOfWeek()->eq(Carbon::now($this->timezone)->addWeek()->startOfWeek()))
-            {
+                return 'Last '.$day->format('l');
+            } elseif ($day->copy()->startOfWeek()->eq(Carbon::now($this->timezone)->addWeek()->startOfWeek())) {
                 // If date is in the next week
-                return 'Next ' . $day->format('l');
-            }
-            else
-            {
+                return 'Next '.$day->format('l');
+            } else {
                 return $this->toInclusiveString('l jS \of F Y', $glue);
             }
         }
 
         // Check if time period is a WEEK
         $week = $this->spans(self::WEEK);
-        if (!is_null($week))
-        {
-            if ($week->copy()->startOfWeek()->eq(Carbon::now($this->timezone)->startOfWeek()))
-            {
+        if (!is_null($week)) {
+            if ($week->copy()->startOfWeek()->eq(Carbon::now($this->timezone)->startOfWeek())) {
                 // If date is in current week
                 return 'This Week';
-            }
-            elseif ($week->copy()->startOfWeek()->eq(Carbon::now($this->timezone)->subWeek()->startOfWeek()))
-            {
+            } elseif ($week->copy()->startOfWeek()->eq(Carbon::now($this->timezone)->subWeek()->startOfWeek())) {
                 // If date is in the week previous
                 return 'Last Week';
-            }
-            elseif ($week->copy()->startOfWeek()->eq(Carbon::now($this->timezone)->addWeek()->startOfWeek()))
-            {
+            } elseif ($week->copy()->startOfWeek()->eq(Carbon::now($this->timezone)->addWeek()->startOfWeek())) {
                 // If date is in the next week
                 return 'Next Week';
-            }
-            else
-            {
+            } else {
                 return $this->toInclusiveString('l jS \of F Y', $glue);
             }
         }
 
         // Check if time period is a single month
         $month = $this->spans(self::MONTH);
-        if (!is_null($month))
-        {
-            if ($month->copy()->year != Carbon::now($this->timezone)->year)
-            {
+        if (!is_null($month)) {
+            if ($month->copy()->year != Carbon::now($this->timezone)->year) {
                 // If date is in the next week
-                return 'In ' . $month->format('F Y');
-            }
-            else
-            {
-                return 'In ' . $month->format('F');
+                return 'In '.$month->format('F Y');
+            } else {
+                return 'In '.$month->format('F');
             }
         }
 
         // Check if time period is a single year
         $start_of_range = $this->spans(self::YEAR);
 
-        if ( ! is_null($start_of_range))
-        {
-            return 'In ' . $start_of_range->year;
+        if (!is_null($start_of_range)) {
+            return 'In '.$start_of_range->year;
         }
 
         return $this->toInclusiveString('l jS \of F Y', $glue);
@@ -490,44 +477,37 @@ class DateRange
      *      - year
      *
      * @return Carbon|null The beginning of the time period, or null if the date range does not
-     * match any supported time periods.
+     *                     match any supported time periods.
      */
     public function spans($time_period)
     {
-        if (!array_key_exists($time_period, self::$time_periods))
-        {
+        if (!array_key_exists($time_period, self::$time_periods)) {
             throw new \InvalidArgumentException("Unsupported time period '$time_period'!");
         }
 
-        if( ! $this->isBounded())
-        {
+        if (!$this->isBounded()) {
             // If the date range does not have a bound then it will not span any time periods.
             return false;
         }
 
-        $start_of_period_func = 'startOf' . $time_period;
-        $end_of_period_func = 'endOf' . $time_period;
+        $start_of_period_func = 'startOf'.$time_period;
+        $end_of_period_func = 'endOf'.$time_period;
 
         // After must be positioned at the end of the time period
-        if (!$this->after->copy()->$end_of_period_func()->eq($this->after))
-        {
-            return null;
+        if (!$this->after->copy()->$end_of_period_func()->eq($this->after)) {
+            return;
         }
 
         // Before must be positioned at the start of the time period
-        if (!$this->before->copy()->$start_of_period_func()->eq($this->before))
-        {
-            return null;
+        if (!$this->before->copy()->$start_of_period_func()->eq($this->before)) {
+            return;
         }
 
         // $after add a second should equal the beginning of the time period for $before sub one second.
-        if ($this->before->copy()->subSecond()->$start_of_period_func()->eq($this->after->copy()->addSecond()))
-        {
+        if ($this->before->copy()->subSecond()->$start_of_period_func()->eq($this->after->copy()->addSecond())) {
             return $this->after->copy()->addSecond();
-        }
-        else
-        {
-            return null;
+        } else {
+            return;
         }
     }
 
@@ -535,23 +515,22 @@ class DateRange
      * Determines the time period that a date range spans.
      *
      * @return string|null A string which corresponds to a class constant time period
-     * or null if the date range does not match any supported time spans.
+     *                     or null if the date range does not match any supported time spans.
      */
     public function getTimeperiod()
     {
-        foreach(array_keys(self::$time_periods) AS $time_period)
-        {
-            if(! is_null($this->spans($time_period)))
-            {
+        foreach (array_keys(self::$time_periods) as $time_period) {
+            if (!is_null($this->spans($time_period))) {
                 return $time_period;
             }
         }
 
-        return null;
+        return;
     }
 
     /**
      * Determines if a date range has an upper bound.
+     *
      * @return bool
      */
     public function isOpenEnded()
@@ -563,6 +542,7 @@ class DateRange
      * Combines a collection of date ranges into a single date range.
      *
      * @param DateRange[] $ranges
+     *
      * @return DateRange
      *
      * @TODO Doesn't support open started or open ended ranges.
@@ -574,18 +554,15 @@ class DateRange
     {
         $range = new static();
 
-        foreach($ranges AS $cur_range)
-        {
+        foreach ($ranges as $cur_range) {
             $cur_start = $cur_range->after;
-            $cur_end   = $cur_range->before;
+            $cur_end = $cur_range->before;
 
-            if(is_null($range->before) || $cur_end->lt($range->before))
-            {
+            if (is_null($range->before) || $cur_end->lt($range->before)) {
                 $range->before = $cur_end;
             }
 
-            if(is_null($range->after) || $cur_start->gt($range->after))
-            {
+            if (is_null($range->after) || $cur_start->gt($range->after)) {
                 $range->after = $cur_start;
             }
         }
@@ -598,13 +575,13 @@ class DateRange
      *
      * This is not possible, for obvious reasons, on open ended or open start date ranges.
      *
-     * @return int
      * @throws Exception
+     *
+     * @return int
      */
     public function days()
     {
-        if($this->isOpenEnded() || $this->isOpenStarted())
-        {
+        if ($this->isOpenEnded() || $this->isOpenStarted()) {
             throw new Exception('The number of days within a range cannot be calculated for ranges that are open ended or open started.');
         }
 
@@ -613,6 +590,7 @@ class DateRange
 
     /**
      * Determines if a date range has a lower bound.
+     *
      * @return bool
      */
     public function isOpenStarted()
@@ -625,29 +603,29 @@ class DateRange
      *
      * For example, you could offset 1 day, 6 months, 4 years.
      *
-     * @param int $offset
-     * @param string $time_period A class constant that represents a time period.
-     * @param bool|true $rollover A flag that indicates whether dates should be
-     * allowed to rollover to the next month if the number of days is greater then
-     * the number of days in the current month. For example, if Month A has 31 days
-     * and is offset by -1 month to Month B and his month on has 30 days, then the
-     * new date would become the first day in Month A; not Month B! If you set
-     * rollover to false then the new date would become the last day in Month B and
-     * time would remain unchanged; micro seconds are not supported.
+     * @param int        $offset
+     * @param string     $time_period   A class constant that represents a time period.
+     * @param bool|true  $rollover      A flag that indicates whether dates should be
+     *                                  allowed to rollover to the next month if the number of days is greater then
+     *                                  the number of days in the current month. For example, if Month A has 31 days
+     *                                  and is offset by -1 month to Month B and his month on has 30 days, then the
+     *                                  new date would become the first day in Month A; not Month B! If you set
+     *                                  rollover to false then the new date would become the last day in Month B and
+     *                                  time would remain unchanged; micro seconds are not supported.
      * @param bool|false $keep_position A flag that, if enabled, will ensure that if
-     * a date is set to the start or end of the time period, then it will keep this
-     * position after the offset. For example, if moved from Month A to Month B, but
-     * the date range ends on the last day of the month, then once moved to Month B,
-     * the date will be set to the end of this month. This is particularly important
-     * because Month A may only have 30 days, meaning that if this is disabled, the
-     * new date would be the 30th of Month B; which could have 31 days.
+     *                                  a date is set to the start or end of the time period, then it will keep this
+     *                                  position after the offset. For example, if moved from Month A to Month B, but
+     *                                  the date range ends on the last day of the month, then once moved to Month B,
+     *                                  the date will be set to the end of this month. This is particularly important
+     *                                  because Month A may only have 30 days, meaning that if this is disabled, the
+     *                                  new date would be the 30th of Month B; which could have 31 days.
+     *
      * @return static
      */
     public function offset($offset, $time_period, $rollover = true, $keep_position = false)
     {
         // First we need to validate the time period.
-        if ( ! array_key_exists($time_period, self::$time_periods))
-        {
+        if (!array_key_exists($time_period, self::$time_periods)) {
             throw new \InvalidArgumentException('Time period must be one of the time periods listed in the class constants');
         }
 
@@ -659,21 +637,19 @@ class DateRange
         // Make a copy of the original dates.
         $original_dates = [];
 
-        $original_dates['after']['date']      = is_null($this->after) ? null : $this->after->copy();
+        $original_dates['after']['date'] = is_null($this->after) ? null : $this->after->copy();
 
-        $original_dates['after']['position']  = is_null($this->after) ? null : $this->getDatePositionIn($this->after->copy(), $time_period);
+        $original_dates['after']['position'] = is_null($this->after) ? null : $this->getDatePositionIn($this->after->copy(), $time_period);
 
-        $original_dates['before']['date']     = is_null($this->before) ? null : $this->before->copy();
+        $original_dates['before']['date'] = is_null($this->before) ? null : $this->before->copy();
 
         $original_dates['before']['position'] = is_null($this->before) ? null : $this->getDatePositionIn($this->before->copy(), $time_period);
 
         // Calculate the new dates.
         $new_dates = [];
 
-        foreach(['after', 'before'] AS $date_name)
-        {
-            if(is_null($this->$date_name))
-            {
+        foreach (['after', 'before'] as $date_name) {
+            if (is_null($this->$date_name)) {
                 $new_dates[$date_name] = null;
 
                 continue;
@@ -686,8 +662,7 @@ class DateRange
             // and year because of the differences in the number of days that each may container.
             // Some months have more days then over; some years have more days then others; but all
             // days have the same number of hours, minutes etc.
-            if($time_period == self::MONTH)
-            {
+            if ($time_period == self::MONTH) {
                 $new_dates[$date_name] = $this->$date_name->copy()->month($original_date->month + $offset);
 
                 $new_date = &$new_dates[$date_name];
@@ -696,13 +671,10 @@ class DateRange
                 // a month with the same value that we get from a local method that calculates the
                 // new month after being offset without rollover. If these two values do not match
                 // then we will refactor the new date.
-                if($rollover == false && $this->offsetMonthInDate($original_date, $offset) != $new_date->month)
-                {
+                if ($rollover == false && $this->offsetMonthInDate($original_date, $offset) != $new_date->month) {
                     $new_date = $this->refactorRolledOverDate($new_date, $original_date);
                 }
-            }
-            elseif($time_period == self::YEAR)
-            {
+            } elseif ($time_period == self::YEAR) {
                 $new_dates[$date_name] = $this->$date_name->copy()->year($original_date->year + $offset);
 
                 $new_date = &$new_dates[$date_name];
@@ -710,22 +682,18 @@ class DateRange
                 // Now if rollover should be disabled we will check to see whether the month for the
                 // new date has changed. If it has then the month will hvae rolled over; in which
                 // case we will refactor it.
-                if($rollover == false && $original_date->month != $new_date->month)
-                {
+                if ($rollover == false && $original_date->month != $new_date->month) {
                     $new_date = $this->refactorRolledOverDate($new_date, $original_dates[$date_name]['date']);
                 }
-            }
-            else
-            {
+            } else {
                 $new_dates[$date_name] = $this->$date_name->copy()->$offset_method();
             }
 
             // Make any position adjustments that are necessary. If a date is positioned at the
             // start or end of a time period then we will adjust any offset dates to be at the
             // start and end of the new time period.
-            if( ! is_null($original_dates[$date_name]['position']) && $keep_position)
-            {
-                $method = $original_dates[$date_name]['position'] . "of$time_period";
+            if (!is_null($original_dates[$date_name]['position']) && $keep_position) {
+                $method = $original_dates[$date_name]['position']."of$time_period";
                 $new_dates[$date_name]->$method();
             }
         }
@@ -738,13 +706,13 @@ class DateRange
      *
      * @param Carbon $date_time
      * @param $time_period
+     *
      * @return string|null A class constant that represents a time period, or null.
      */
     protected function getDatePositionIn(Carbon $date_time, $time_period)
     {
         // First we need to validate the time period.
-        if ( ! array_key_exists($time_period, self::$time_periods))
-        {
+        if (!array_key_exists($time_period, self::$time_periods)) {
             throw new \InvalidArgumentException('Time period must be one of the time periods listed in the class constants');
         }
 
@@ -752,21 +720,19 @@ class DateRange
         // period provided.
         $time_period_start_method = "startOf$time_period";
 
-        if($date_time->copy()->eq($date_time->copy()->$time_period_start_method()))
-        {
+        if ($date_time->copy()->eq($date_time->copy()->$time_period_start_method())) {
             return self::START;
         }
 
         // Now we will check to see whether the date is positioned at the end of the time period
         // provided.
-        $time_period_end_method   = "endOf$time_period";
+        $time_period_end_method = "endOf$time_period";
 
-        if($date_time->copy()->eq($date_time->copy()->$time_period_end_method()))
-        {
+        if ($date_time->copy()->eq($date_time->copy()->$time_period_end_method())) {
             return self::END;
         }
 
-        return null;
+        return;
     }
 
     /**
@@ -774,6 +740,7 @@ class DateRange
      *
      * @param Carbon $original_date
      * @param $offset
+     *
      * @return bool
      *
      * @TODO Add support for offsets greater then 12 for months.
@@ -783,22 +750,16 @@ class DateRange
         $original_month = $original_date->month;
 
         // Calculate expected month if offset is positive.
-        if($offset >= 0 && ($original_month + $offset) <= 12)
-        {
+        if ($offset >= 0 && ($original_month + $offset) <= 12) {
             $expected_month = $original_month + $offset;
-        }
-        elseif($offset >= 0)
-        {
+        } elseif ($offset >= 0) {
             $expected_month = 0 + ($offset - (12 - $original_month));
         }
 
         // Calculate expected month if offset is negative.
-        elseif($offset < 0 && ($original_month + $offset) >= 1)
-        {
+        elseif ($offset < 0 && ($original_month + $offset) >= 1) {
             $expected_month = $original_month + $offset;
-        }
-        elseif($offset < 0)
-        {
+        } elseif ($offset < 0) {
             $expected_month = 12 + ($offset + $original_month);
         }
 
@@ -811,6 +772,7 @@ class DateRange
      *
      * @param Carbon $date
      * @param Carbon $original_date
+     *
      * @return \DateTime
      */
     protected function refactorRolledOverDate(Carbon $date, Carbon $original_date)
@@ -844,7 +806,7 @@ class DateRange
     /**
      * Determines if a date range is inverted.
      *
-     * @return boolean
+     * @return bool
      */
     public function isInverted()
     {
@@ -856,20 +818,21 @@ class DateRange
      *
      * @param string $date_format
      * @param string $glue
+     *
      * @return string
      */
     public function toInclusiveString($date_format = 'l jS \\of F Y', $glue = ' to ')
     {
         // Return full date range
-        if(is_null($this->getAfter())){
+        if (is_null($this->getAfter())) {
             return 'Before '.$this->getBefore()->subSecond()->format($date_format);
         }
 
-        if(is_null($this->getBefore())){
+        if (is_null($this->getBefore())) {
             return 'After '.$this->getAfter()->subSecond()->format($date_format);
         }
 
-        return $this->getAfter()->addSecond()->format($date_format) . $glue . $this->getBefore()->subSecond()->format($date_format);
+        return $this->getAfter()->addSecond()->format($date_format).$glue.$this->getBefore()->subSecond()->format($date_format);
     }
 
     /**
@@ -877,24 +840,20 @@ class DateRange
      *
      * @param string $date_format
      * @param string $glue
+     *
      * @return string
      */
     public function toString($date_format = 'l jS \\of F Y', $glue = ' to ')
     {
-        if ($this->isOpenEnded())
-        {
+        if ($this->isOpenEnded()) {
             // Check if time period is open ended
-            return 'After ' . $this->after->format($date_format);
-        }
-        elseif ($this->isOpenStarted())
-        {
+            return 'After '.$this->after->format($date_format);
+        } elseif ($this->isOpenStarted()) {
             // Check if time period is open started
-            return 'Before ' . $this->before->format($date_format);
-        }
-        else
-        {
+            return 'Before '.$this->before->format($date_format);
+        } else {
             // Return full date range
-            return $this->after->format($date_format) . $glue . $this->before->format($date_format);
+            return $this->after->format($date_format).$glue.$this->before->format($date_format);
         }
     }
 
