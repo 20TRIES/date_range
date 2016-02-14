@@ -265,23 +265,39 @@ class DateRange
     }
 
     /**
+     * Creates a date range that spans a month from a given year and month.
+     *
+     * @param int year
+     * @param int month
+     * @param string timezone
+     * 
+     * @return DateRange
+     */
+    public static function forMonth($year, $month, $timezone = null)
+    {
+        return static::between(
+            Carbon::create($year, $month, null, null, null, null, $timezone)->startOfMonth(),
+            Carbon::create($year, $month, null, null, null, null, $timezone)->endOfMonth()
+        );
+    }
+
+    /**
      * Creates a date range that spans a month, using the month taken from a date / time string and
      * a given format.
      *
-     * @param string $format
-     * @param string $time
-     * @param string $tz
+     * @param int year
+     * @param int month
+     * @param string timezone
      *
      * @return DateRange
      */
-    public static function forMonth($format, $time, $tz = 'GB')
+    public static function forMonthContaining($time, $format = null, $timezone = null)
     {
-        return static::between(
-            Carbon::createFromFormat($format, $time, $tz)->startOfMonth(),
-            // Why like this you may ask? Because we need to avoid issues with months that have
-            // varying lengths. See offset() method for an example and more detailed description.
-            Carbon::createFromFormat($format, $time, $tz)->endOfMonth()
-        );
+        if (!$time instanceof Carbon) {
+            $time = Carbon::createFromFormat($format, $time, $timezone);
+        }
+
+        return self::forMonth($time->year, $time->month);
     }
 
     /**
