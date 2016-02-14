@@ -1,12 +1,14 @@
 <?php namespace _20TRIES;
 
+use _20TRIES\Exceptions\DateRangeException;
+use _20TRIES\Exceptions\TimezoneException;
 use Carbon\Carbon;
 
 /**
  * An object for storing and accessing a date range.
  *
  * @package App\libraries\ValueObjects
- * @since   0.1
+ * @since   v0
  * @author  Marcus T <marcust261@icloud.com>
  */
 class DateRange
@@ -25,6 +27,11 @@ class DateRange
      * @var Carbon
      */
     protected $before;
+
+    /**
+     * @var \DateTimeZone
+     */
+    protected $timezone;
 
     /**
      * @var string A time period
@@ -69,19 +76,54 @@ class DateRange
     ];
 
     /**
-     * Constructor
-     * @param string $name
-     * @param Carbon $after
-     * @param Carbon $before
-     * @throws \Exception
+     * Constructor.
+     *
+     * @param Carbon|null $after
+     * @param Carbon|null $before
+     * @param null|string $name
+     * @throws TimezoneException|DateRangeException
      */
     public function __construct(Carbon $after = null, Carbon $before = null, $name = null)
     {
         $this->name = $name;
 
-        $this->after = $after;
+        if(is_null($after) && is_null($before))
+        {
+            throw new DateRangeException('Either an after date or before date must be provided.');
+        }
+        elseif(is_null($after))
+        {
+            $this->timezone = $before->getTimezone();
 
-        $this->before = $before;
+            $this->after = null;
+
+            $this->before = $before;
+        }
+        else
+        {
+            $this->after = $after;
+
+            $this->timezone = $this->after->getTimezone();
+
+            $this->before = $before;
+
+            $before_tz = is_null($this->before->getTimezone()) ? null : $this->before->getTimezone();
+
+            if($before_tz->getName() !== $this->timezone->getName())
+            {
+                throw new TimezoneException('Multiple timezones are not supported.');
+            }
+        }
+    }
+
+    /**
+     * Gets the timezone for a date range.
+     *
+     * @return \DateTimeZone|null
+     */
+    public function getTimezone()
+    {
+        return $this->timezone;
     }
 
     public static function before(Carbon $date_time)
@@ -327,32 +369,32 @@ class DateRange
 
         if ( ! is_null($day))
         {
-            if ($day->copy()->startOfDay()->eq(Carbon::today('GB')))
+            if ($day->copy()->startOfDay()->eq(Carbon::today($this->timezone)))
             {
                 // If date is in current week
                 return 'Today';
             }
-            elseif ($day->copy()->startOfDay()->eq(Carbon::tomorrow('GB')))
+            elseif ($day->copy()->startOfDay()->eq(Carbon::tomorrow($this->timezone)))
             {
                 // If date is in current week
                 return 'Tomorrow';
             }
-            elseif ($day->copy()->startOfDay()->eq(Carbon::yesterday('GB')))
+            elseif ($day->copy()->startOfDay()->eq(Carbon::yesterday($this->timezone)))
             {
                 // If date is in current week
                 return 'Yesterday';
             }
-            elseif ($day->copy()->startOfWeek()->eq(Carbon::now('GB')->startOfWeek()))
+            elseif ($day->copy()->startOfWeek()->eq(Carbon::now($this->timezone)->startOfWeek()))
             {
                 // If date is in current week
                 return 'On ' . $day->format('l');
             }
-            elseif ($day->copy()->startOfWeek()->eq(Carbon::now('GB')->subWeek()->startOfWeek()))
+            elseif ($day->copy()->startOfWeek()->eq(Carbon::now($this->timezone)->subWeek()->startOfWeek()))
             {
                 // If date is in the week previous
                 return 'Last ' . $day->format('l');
             }
-            elseif ($day->copy()->startOfWeek()->eq(Carbon::now('GB')->addWeek()->startOfWeek()))
+            elseif ($day->copy()->startOfWeek()->eq(Carbon::now($this->timezone)->addWeek()->startOfWeek()))
             {
                 // If date is in the next week
                 return 'Next ' . $day->format('l');
@@ -367,17 +409,17 @@ class DateRange
         $week = $this->spans(self::WEEK);
         if (!is_null($week))
         {
-            if ($week->copy()->startOfWeek()->eq(Carbon::now('GB')->startOfWeek()))
+            if ($week->copy()->startOfWeek()->eq(Carbon::now($this->timezone)->startOfWeek()))
             {
                 // If date is in current week
                 return 'This Week';
             }
-            elseif ($week->copy()->startOfWeek()->eq(Carbon::now('GB')->subWeek()->startOfWeek()))
+            elseif ($week->copy()->startOfWeek()->eq(Carbon::now($this->timezone)->subWeek()->startOfWeek()))
             {
                 // If date is in the week previous
                 return 'Last Week';
             }
-            elseif ($week->copy()->startOfWeek()->eq(Carbon::now('GB')->addWeek()->startOfWeek()))
+            elseif ($week->copy()->startOfWeek()->eq(Carbon::now($this->timezone)->addWeek()->startOfWeek()))
             {
                 // If date is in the next week
                 return 'Next Week';
@@ -392,7 +434,7 @@ class DateRange
         $month = $this->spans(self::MONTH);
         if (!is_null($month))
         {
-            if ($month->copy()->year != Carbon::now('GB')->year)
+            if ($month->copy()->year != Carbon::now($this->timezone)->year)
             {
                 // If date is in the next week
                 return 'In ' . $month->format('F Y');
