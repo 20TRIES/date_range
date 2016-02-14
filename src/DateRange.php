@@ -112,7 +112,7 @@ class DateRange
      * @param string $tz
      * @return DateRange
      */
-    public static function tomorrow($tz = 'GB')
+    public static function tomorrow($tz = null)
     {
         return static::between(Carbon::now($tz)->addDay()->startOfDay(), Carbon::now($tz)->addDay()->endOfDay());
     }
@@ -123,7 +123,7 @@ class DateRange
      * @param string $tz
      * @return DateRange
      */
-    public static function today($tz = 'GB')
+    public static function today($tz = null)
     {
         return static::between(Carbon::now($tz)->startOfDay(), Carbon::now($tz)->endOfDay());
     }
@@ -134,7 +134,7 @@ class DateRange
      * @param string $tz
      * @return DateRange
      */
-    public static function yesterday($tz = 'GB')
+    public static function yesterday($tz = null)
     {
         return static::between(Carbon::now($tz)->subDay()->startOfDay(), Carbon::now($tz)->subDay()->endOfDay());
     }
@@ -145,7 +145,7 @@ class DateRange
      * @param string $tz
      * @return DateRange
      */
-    public static function nextWeek($tz = 'GB')
+    public static function nextWeek($tz = null)
     {
         return static::between(Carbon::now($tz)->addWeek()->startOfWeek(), Carbon::now($tz)->addWeek()->endOfWeek());
     }
@@ -156,7 +156,7 @@ class DateRange
      * @param string $tz
      * @return DateRange
      */
-    public static function thisWeek($tz = 'GB')
+    public static function thisWeek($tz = null)
     {
         return static::between(Carbon::now($tz)->startOfWeek(), Carbon::now($tz)->endOfWeek());
     }
@@ -167,7 +167,7 @@ class DateRange
      * @param string $tz
      * @return DateRange
      */
-    public static function lastWeek($tz = 'GB')
+    public static function lastWeek($tz = null)
     {
         return static::between(Carbon::now($tz)->subWeek()->startOfWeek(), Carbon::now($tz)->subWeek()->endOfWeek());
     }
@@ -178,7 +178,7 @@ class DateRange
      * @param string $tz
      * @return static
      */
-    public static function nextMonth($tz = 'GB')
+    public static function nextMonth($tz = null)
     {
         return static::between(
             Carbon::now($tz)->startOfMonth()->addMonth(),
@@ -194,7 +194,7 @@ class DateRange
      * @param string $tz
      * @return static
      */
-    public static function thisMonth($tz = 'GB')
+    public static function thisMonth($tz = null)
     {
         return static::between(Carbon::now($tz)->startOfMonth(), Carbon::now($tz)->endOfMonth());
     }
@@ -205,7 +205,7 @@ class DateRange
      * @param string $tz
      * @return static
      */
-    public static function lastMonth($tz = 'GB')
+    public static function lastMonth($tz = null)
     {
         return static::between(
             Carbon::now($tz)->startOfMonth()->subMonth(),
@@ -224,7 +224,7 @@ class DateRange
      * @param string $tz
      * @return DateRange
      */
-    public static function forMonth($format, $time, $tz = 'GB')
+    public static function forMonth($format, $time, $tz = null)
     {
         return static::between(
             Carbon::createFromFormat($format, $time, $tz)->startOfMonth(),
@@ -240,7 +240,7 @@ class DateRange
      * @param string $tz
      * @return static
      */
-    public static function nextYear($tz = 'GB')
+    public static function nextYear($tz = null)
     {
         return static::between(
             Carbon::now($tz)->startOfYear()->addYear(),
@@ -256,7 +256,7 @@ class DateRange
      * @param string $tz
      * @return static
      */
-    public static function thisYear($tz = 'GB')
+    public static function thisYear($tz = null)
     {
         return static::between(Carbon::now($tz)->startOfYear(), Carbon::now($tz)->endOfYear());
     }
@@ -267,7 +267,7 @@ class DateRange
      * @param string $tz
      * @return static
      */
-    public static function lastYear($tz = 'GB')
+    public static function lastYear($tz = null)
     {
         return static::between(
             Carbon::now($tz)->startOfYear()->subYear(),
