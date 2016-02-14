@@ -1,13 +1,15 @@
-<?php namespace _20TRIES\Test;
+<?php
+
+namespace _20TRIES\Test;
 
 use _20TRIES\DateRange;
 use Carbon\Carbon;
 
 /**
- * Class ConstructorTest
+ * Class ConstructorTest.
  *
- * @package _20TRIES\Test
  * @author Marcus T <marcus.turner@creare.uk>
+ *
  * @since v0
  */
 class ConstructorTest extends \PHPUnit_Framework_TestCase
