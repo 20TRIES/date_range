@@ -282,25 +282,6 @@ class DateRange
     }
 
     /**
-     * Creates a date range that spans a month, using the month taken from a date / time string and
-     * a given format.
-     *
-     * @param int year
-     * @param int month
-     * @param string timezone
-     *
-     * @return DateRange
-     */
-    public static function forMonthContaining($time, $format = null, $timezone = null)
-    {
-        if (!$time instanceof Carbon) {
-            $time = Carbon::createFromFormat($format, $time, $timezone);
-        }
-
-        return self::forMonth($time->year, $time->month);
-    }
-
-    /**
      * Creates a date range that spans next year.
      *
      * @param string $tz
