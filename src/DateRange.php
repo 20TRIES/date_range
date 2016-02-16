@@ -90,20 +90,18 @@ class DateRange
     {
         $this->name = $name;
 
+        $this->after = $after;
+
+        $this->before = $before;
+
         if (is_null($after) && is_null($before)) {
             throw new DateRangeException('Either an after date or before date must be provided.');
-        } elseif (is_null($after)) {
+        } elseif (is_null($after) && !is_null($before)) {
             $this->timezone = $before->getTimezone();
-
-            $this->after = null;
-
-            $this->before = $before;
+        } elseif (is_null($before)) {
+            $this->timezone = $after->getTimezone();
         } else {
-            $this->after = $after;
-
             $this->timezone = $this->after->getTimezone();
-
-            $this->before = $before;
 
             $before_tz = is_null($this->before->getTimezone()) ? null : $this->before->getTimezone();
 

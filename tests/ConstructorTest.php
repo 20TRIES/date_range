@@ -54,7 +54,7 @@ class ConstructorTest extends \PHPUnit_Framework_TestCase
         new DateRange();
     }
 
-    public function test_timezone_is_set_from_dates_provided()
+    public function test_timezone_is_initialised_with_both_dates_provided()
     {
         $timezone = 'GB';
 
@@ -66,27 +66,65 @@ class ConstructorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($timezone, $range->getTimezone()->getName());
     }
 
-    public function test_after_date_is_set()
+    public function test_after_date_is_initialised_with_both_dates_provided()
     {
-        $timezone = 'GB';
-
         $range = new DateRange(
-            $after = Carbon::today($timezone)->subSecond(),
-            Carbon::today($timezone)->endOfDay()->addSecond()
+            $expected = Carbon::today()->subSecond(),
+            Carbon::today()->endOfDay()->addSecond()
         );
 
-        $this->assertEquals($after, $range->getAfter());
+        $this->assertEquals($expected, $range->getAfter());
     }
 
-    public function test_before_date_is_set()
+    public function test_before_date_is_initialised_with_both_dates_provided()
     {
-        $timezone = 'GB';
-
         $range = new DateRange(
-            Carbon::today($timezone)->subSecond(),
-            $before = Carbon::today($timezone)->endOfDay()->addSecond()
+            Carbon::today()->subSecond(),
+            $expected = Carbon::today()->endOfDay()->addSecond()
         );
 
-        $this->assertEquals($before, $range->getBefore());
+        $this->assertEquals($expected, $range->getBefore());
+    }
+
+    public function test_timezone_is_initialised_without_after_date()
+    {
+        $range = new DateRange(null, Carbon::today($expected = 'GB')->endOfDay()->addSecond());
+
+        $this->assertEquals($expected, $range->getTimezone()->getName());
+    }
+
+    public function test_after_date_is_initialised_without_after_date()
+    {
+        $range = new DateRange($expected = null, Carbon::today()->endOfDay()->addSecond());
+
+        $this->assertEquals($expected, $range->getAfter());
+    }
+
+    public function test_before_date_is_initialised_without_after_date()
+    {
+        $range = new DateRange(null, $expected = Carbon::today()->endOfDay()->addSecond());
+
+        $this->assertEquals($expected, $range->getBefore());
+    }
+
+    public function test_timezone_is_initialised_without_before_date()
+    {
+        $range = new DateRange(Carbon::today($expected = 'GB')->subSecond(), null);
+
+        $this->assertEquals($expected, $range->getTimezone()->getName());
+    }
+
+    public function test_after_date_is_initialised_without_before_date()
+    {
+        $range = new DateRange($expected = Carbon::today()->subSecond(), null);
+
+        $this->assertEquals($expected, $range->getAfter());
+    }
+
+    public function test_before_date_is_initialised_without_before_date()
+    {
+        $range = new DateRange(Carbon::today()->subSecond(), $expected = null);
+
+        $this->assertEquals($expected, $range->getBefore());
     }
 }
