@@ -339,7 +339,8 @@ class DateRange
     }
 
     /**
-     * Gets the after date of a date range.
+     * Gets a carbon instance that represents the date and time that a date range range begins
+     * immediately after.
      *
      * @return Carbon
      */
@@ -349,13 +350,34 @@ class DateRange
     }
 
     /**
-     * Gets the before date of a date range.
+     * Gets a carbon instance that represents the earliest datetime within a given date range.
+     *
+     * @return Carbon
+     */
+    public function getFrom()
+    {
+        return $this->getAfter()->addSecond();
+    }
+
+    /**
+     * Gets a carbon instance that represents the datetime that a date range range ends immediately
+     * before.
      *
      * @return Carbon
      */
     public function getBefore()
     {
         return (is_null($this->before)) ? $this->before : $this->before->copy();
+    }
+
+    /**
+     * Gets a carbon instance that represents the latest date and time within a given date range.
+     *
+     * @return Carbon
+     */
+    public function getTo()
+    {
+        return $this->getBefore()->subSecond();
     }
 
     /**
