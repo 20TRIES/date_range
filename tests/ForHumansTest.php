@@ -6,6 +6,13 @@ use _20TRIES\DateRange;
 use Carbon\Carbon;
 use PHPUnit_Framework_TestCase;
 
+/**
+ * Class ForHumansTest.
+ *
+ * @author Marcus T <marcus.turner@creare.uk>
+ *
+ * @since v0
+ */
 class ForHumansTest extends PHPUnit_Framework_TestCase
 {
     public function test_today()
