@@ -14,11 +14,9 @@ Or in your composer.json file
 
 `
 "require": {
-    "20tries/date_range": "dev-master"
+    "20tries/date_range": "0.0.*"
   },
 `
-
-It is recommended to use `dev-master` (currently default) as this is the most stable; other branches are currently in development and will be subject to API change.
 
 ## Documentation 
 
