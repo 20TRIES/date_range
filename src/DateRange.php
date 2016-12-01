@@ -38,6 +38,11 @@ class DateRange
     /**
      * @var string A time period
      */
+    const HOUR = 'Hour';
+
+    /**
+     * @var string A time period
+     */
     const DAY = 'Day';
 
     /**
@@ -68,7 +73,7 @@ class DateRange
     /**
      * @var array An array of accepted time periods
      */
-    public static $time_periods = [self::DAY => self::DAY, self::WEEK => self::WEEK, self::MONTH => self::MONTH, self::YEAR => self::YEAR];
+    public static $time_periods = [self::DAY => self::DAY, self::WEEK => self::WEEK, self::MONTH => self::MONTH, self::YEAR => self::YEAR, self::HOUR => self::HOUR];
 
     protected $timeperiod_formats = [
         self::DAY   => 'l',
@@ -142,6 +147,40 @@ class DateRange
     public static function between(Carbon $from, Carbon $to)
     {
         return new static($from->subSecond(), $to->addSecond());
+    }
+
+
+    /**
+     * Creates a date range that spans the current hour.
+     *
+     * @param null $tz
+     * @return DateRange
+     */
+    public static function thisHour($tz = null)
+    {
+        return static::between(Carbon::now($tz)->minute(0)->second(0), Carbon::now($tz)->minute(59)->second(59));
+    }
+
+    /**
+     * Creates a date range that spans the previous hour.
+     *
+     * @param null $tz
+     * @return DateRange
+     */
+    public static function lastHour($tz = null)
+    {
+        return self::thisHour($tz)->offset(-1, self::HOUR);
+    }
+
+    /**
+     * Creates a date range that spans the next hour.
+     *
+     * @param null $tz
+     * @return DateRange
+     */
+    public static function nextHour($tz = null)
+    {
+        return self::thisHour($tz)->offset(1, self::HOUR);
     }
 
     /**
@@ -738,21 +777,63 @@ class DateRange
 
         // Now we will check to see whether the date is positioned at the beginning of the time
         // period provided.
-        $time_period_start_method = "startOf$time_period";
-
-        if ($date_time->copy()->eq($date_time->copy()->$time_period_start_method())) {
+        $start_date = $this->getStartOf($time_period, $date_time);
+        if ($date_time->copy()->eq($start_date)) {
             return self::START;
         }
 
         // Now we will check to see whether the date is positioned at the end of the time period
         // provided.
-        $time_period_end_method = "endOf$time_period";
-
-        if ($date_time->copy()->eq($date_time->copy()->$time_period_end_method())) {
+        $end_date = $this->getEndOf($time_period, $date_time);
+        if ($date_time->copy()->eq($end_date)) {
             return self::END;
         }
+    }
 
-        return;
+    /**
+     * Gets the start of a time period from a given date.
+     *
+     * @param string $time_period
+     * @param Carbon $date_time
+     * @return null|Carbon
+     */
+    protected function getStartOf($time_period, Carbon $date_time)
+    {
+        $start = null;
+        switch ($time_period) {
+            case self::HOUR:
+                $start = $date_time->copy()->minute(0)->second(0);
+                break;
+            case self::DAY:
+            case self::WEEK:
+            case self::MONTH:
+                $start = $date_time->copy()->{"startOf$time_period"}();
+                break;
+        }
+        return $start;
+    }
+
+    /**
+     * Gets the end of a time period from a given date.
+     *
+     * @param string $time_period
+     * @param Carbon $date_time
+     * @return null|Carbon
+     */
+    protected function getEndOf($time_period, Carbon $date_time)
+    {
+        $start = null;
+        switch ($time_period) {
+            case self::HOUR:
+                $start = $date_time->copy()->minute(59)->second(59);
+                break;
+            case self::DAY:
+            case self::WEEK:
+            case self::MONTH:
+                $start = $date_time->copy()->{"endOf$time_period"}();
+                break;
+        }
+        return $start;
     }
 
     /**
