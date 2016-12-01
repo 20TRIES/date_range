@@ -7,10 +7,6 @@ use Carbon\Carbon;
 
 /**
  * Class GettersTest.
- *
- * @author Marcus T <marcus.turner@creare.uk>
- *
- * @since v0
  */
 class GettersTest extends \PHPUnit_Framework_TestCase
 {
