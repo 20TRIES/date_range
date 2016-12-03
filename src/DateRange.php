@@ -179,7 +179,7 @@ class DateRange
      */
     public static function thisHour($tz = null)
     {
-        return static::between(Carbon::now($tz)->minute(0)->second(0), Carbon::now($tz)->minute(59)->second(59));
+        return self::forTimePeriod(self::HOUR, Carbon::now($tz));
     }
 
     /**
@@ -190,7 +190,7 @@ class DateRange
      */
     public static function lastHour($tz = null)
     {
-        return self::thisHour($tz)->offset(-1, self::HOUR);
+        return self::forTimePeriod(self::HOUR, Carbon::now($tz)->subHour());
     }
 
     /**
@@ -201,7 +201,7 @@ class DateRange
      */
     public static function nextHour($tz = null)
     {
-        return self::thisHour($tz)->offset(1, self::HOUR);
+        return self::forTimePeriod(self::HOUR, Carbon::now($tz)->addHour());
     }
 
     /**
@@ -213,7 +213,7 @@ class DateRange
      */
     public static function tomorrow($tz = 'GB')
     {
-        return static::between(Carbon::now($tz)->addDay()->startOfDay(), Carbon::now($tz)->addDay()->endOfDay());
+        return self::forTimePeriod(self::DAY, Carbon::tomorrow($tz));
     }
 
     /**
@@ -225,7 +225,7 @@ class DateRange
      */
     public static function today($tz = 'GB')
     {
-        return static::between(Carbon::now($tz)->startOfDay(), Carbon::now($tz)->endOfDay());
+        return self::forTimePeriod(self::DAY, Carbon::today($tz));
     }
 
     /**
@@ -237,7 +237,7 @@ class DateRange
      */
     public static function yesterday($tz = 'GB')
     {
-        return static::between(Carbon::now($tz)->subDay()->startOfDay(), Carbon::now($tz)->subDay()->endOfDay());
+        return self::forTimePeriod(self::DAY, Carbon::yesterday($tz));
     }
 
     /**
@@ -249,7 +249,7 @@ class DateRange
      */
     public static function nextWeek($tz = 'GB')
     {
-        return static::between(Carbon::now($tz)->addWeek()->startOfWeek(), Carbon::now($tz)->addWeek()->endOfWeek());
+        return self::forTimePeriod(self::WEEK, Carbon::now($tz)->addWeek());
     }
 
     /**
@@ -261,7 +261,7 @@ class DateRange
      */
     public static function thisWeek($tz = 'GB')
     {
-        return static::between(Carbon::now($tz)->startOfWeek(), Carbon::now($tz)->endOfWeek());
+        return self::forTimePeriod(self::WEEK, Carbon::now($tz));
     }
 
     /**
@@ -273,7 +273,7 @@ class DateRange
      */
     public static function lastWeek($tz = 'GB')
     {
-        return static::between(Carbon::now($tz)->subWeek()->startOfWeek(), Carbon::now($tz)->subWeek()->endOfWeek());
+        return self::forTimePeriod(self::WEEK, Carbon::now($tz)->subWeek());
     }
 
     /**
@@ -285,12 +285,7 @@ class DateRange
      */
     public static function nextMonth($tz = 'GB')
     {
-        return static::between(
-            Carbon::now($tz)->startOfMonth()->addMonth(),
-            // Why like this you may ask? Because we need to avoid issues with months that have
-            // varying lengths. See offset() method for an example and more detailed description.
-            Carbon::now($tz)->startOfMonth()->addMonth()->endOfMonth()
-        );
+        return self::forTimePeriod(self::MONTH, Carbon::now($tz)->startOfMonth()->addMonth());
     }
 
     /**
@@ -302,7 +297,7 @@ class DateRange
      */
     public static function thisMonth($tz = 'GB')
     {
-        return static::between(Carbon::now($tz)->startOfMonth(), Carbon::now($tz)->endOfMonth());
+        return self::forTimePeriod(self::MONTH, Carbon::now($tz));
     }
 
     /**
@@ -314,12 +309,7 @@ class DateRange
      */
     public static function lastMonth($tz = 'GB')
     {
-        return static::between(
-            Carbon::now($tz)->startOfMonth()->subMonth(),
-            // Why like this you may ask? Because we need to avoid issues with months that have
-            // varying lengths. See offset() method for an example and more detailed description.
-            Carbon::now($tz)->startOfMonth()->subMonth()->endOfMonth()
-        );
+        return self::forTimePeriod(self::MONTH, Carbon::now($tz)->startOfMonth()->subMonth());
     }
 
     /**
@@ -334,12 +324,7 @@ class DateRange
      */
     public static function forMonth($format, $time, $tz = 'GB')
     {
-        return static::between(
-            Carbon::createFromFormat($format, $time, $tz)->startOfMonth(),
-            // Why like this you may ask? Because we need to avoid issues with months that have
-            // varying lengths. See offset() method for an example and more detailed description.
-            Carbon::createFromFormat($format, $time, $tz)->endOfMonth()
-        );
+        return self::forTimePeriod(self::MONTH, Carbon::createFromFormat($format, $time, $tz)->startOfMonth());
     }
 
     /**
@@ -347,16 +332,11 @@ class DateRange
      *
      * @param string $tz
      *
-     * @return static
+     * @return statics
      */
     public static function nextYear($tz = 'GB')
     {
-        return static::between(
-            Carbon::now($tz)->startOfYear()->addYear(),
-            // Why like this you may ask? Because we need to avoid issues with months that have
-            // varying lengths. See offset() method for an example and more detailed description.
-            Carbon::now($tz)->startOfYear()->addYear()->endOfYear()
-        );
+        return self::forTimePeriod(self::YEAR, Carbon::today($tz)->startOfYear()->addYear());
     }
 
     /**
@@ -368,7 +348,7 @@ class DateRange
      */
     public static function thisYear($tz = 'GB')
     {
-        return static::between(Carbon::now($tz)->startOfYear(), Carbon::now($tz)->endOfYear());
+        return self::forTimePeriod(self::YEAR, Carbon::today($tz));
     }
 
     /**
@@ -380,12 +360,7 @@ class DateRange
      */
     public static function lastYear($tz = 'GB')
     {
-        return static::between(
-            Carbon::now($tz)->startOfYear()->subYear(),
-            // Why like this you may ask? Because we need to avoid issues with months that have
-            // varying lengths. See offset() method for an example and more detailed description.
-            Carbon::now($tz)->startOfYear()->subYear()->endOfYear()
-        );
+        return self::forTimePeriod(self::YEAR, Carbon::today($tz)->startOfYear()->subYear());
     }
 
     /**
