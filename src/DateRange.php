@@ -149,6 +149,29 @@ class DateRange
         return new static($from->subSecond(), $to->addSecond());
     }
 
+    /**
+     * Gets a date range for a time period.
+     *
+     * @param string $time_period
+     * @param Carbon $date_time
+     * @return DateRange
+     */
+    public static function forTimePeriod($time_period, Carbon $date_time)
+    {
+        $time_period = self::parseTimePeriod($time_period);
+        switch ($time_period) {
+            case self::HOUR:
+                return static::between(
+                    $date_time->copy()->minute(0)->second(0),
+                    $date_time->copy()->minute(59)->second(59)
+                );
+            default:
+                return static::between(
+                    $date_time->copy()->{"startOf{$time_period}"}(),
+                    $date_time->copy()->{"endOf{$time_period}"}()
+                );
+        }
+    }
 
     /**
      * Creates a date range that spans the current hour.
@@ -391,9 +414,21 @@ class DateRange
     /**
      * Gets a carbon instance that represents the earliest datetime within a given date range.
      *
+     * @deprecated 0.0.3 Replaced by start method to improve readability; will be removed in 1.0.0
+     *
      * @return Carbon
      */
     public function getFrom()
+    {
+        return $this->getAfter()->addSecond();
+    }
+
+    /**
+     * Gets the start of a date range.
+     *
+     * @return Carbon
+     */
+    public function start()
     {
         return $this->getAfter()->addSecond();
     }
@@ -412,9 +447,21 @@ class DateRange
     /**
      * Gets a carbon instance that represents the latest date and time within a given date range.
      *
+     * @deprecated 0.0.3 Replaced by end method to improve readability; will be removed in 1.0.0
+     *
      * @return Carbon
      */
     public function getTo()
+    {
+        return $this->getBefore()->subSecond();
+    }
+
+    /**
+     * Gets the start of a date range.
+     *
+     * @return Carbon
+     */
+    public function end()
     {
         return $this->getBefore()->subSecond();
     }
@@ -777,63 +824,17 @@ class DateRange
 
         // Now we will check to see whether the date is positioned at the beginning of the time
         // period provided.
-        $start_date = $this->getStartOf($time_period, $date_time);
+        $start_date = self::forTimePeriod($time_period, $date_time)->start();
         if ($date_time->copy()->eq($start_date)) {
             return self::START;
         }
 
         // Now we will check to see whether the date is positioned at the end of the time period
         // provided.
-        $end_date = $this->getEndOf($time_period, $date_time);
+        $end_date = self::forTimePeriod($time_period, $date_time)->end();
         if ($date_time->copy()->eq($end_date)) {
             return self::END;
         }
-    }
-
-    /**
-     * Gets the start of a time period from a given date.
-     *
-     * @param string $time_period
-     * @param Carbon $date_time
-     * @return null|Carbon
-     */
-    protected function getStartOf($time_period, Carbon $date_time)
-    {
-        $start = null;
-        switch ($time_period) {
-            case self::HOUR:
-                $start = $date_time->copy()->minute(0)->second(0);
-                break;
-            case self::DAY:
-            case self::WEEK:
-            case self::MONTH:
-                $start = $date_time->copy()->{"startOf$time_period"}();
-                break;
-        }
-        return $start;
-    }
-
-    /**
-     * Gets the end of a time period from a given date.
-     *
-     * @param string $time_period
-     * @param Carbon $date_time
-     * @return null|Carbon
-     */
-    protected function getEndOf($time_period, Carbon $date_time)
-    {
-        $start = null;
-        switch ($time_period) {
-            case self::HOUR:
-                $start = $date_time->copy()->minute(59)->second(59);
-                break;
-            case self::DAY:
-            case self::WEEK:
-            case self::MONTH:
-                $start = $date_time->copy()->{"endOf$time_period"}();
-                break;
-        }
-        return $start;
     }
 
     /**
@@ -961,5 +962,13 @@ class DateRange
     public function contains(Carbon $date_time)
     {
         return $date_time->gt($this->after) && $date_time->lt($this->before);
+    }
+
+    protected static function parseTimePeriod($time_period)
+    {
+        if (! array_key_exists($time_period, self::$time_periods)) {
+            throw new \InvalidArgumentException("Invalid time period.");
+        }
+        return $time_period;
     }
 }
