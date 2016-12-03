@@ -568,49 +568,38 @@ class DateRange
     /**
      * Determines if a date range spans exactly one entire time period.
      *
-     * For example, if a date range is after Monday at 23:59:59 and before Wednesday 00:00:00
-     * then it will encompass an entire day and thus will have a time period of a single day. This
-     * distinction is useful when attempting to simplify how a date is displayed in a human
-     * readable format.
-     *
-     * Supported time periods include:
-     *      - day
-     *      - month
-     *      - year
-     *
-     * @return Carbon|null The beginning of the time period, or null if the date range does not
-     *                     match any supported time periods.
+     * @param $time_period
+     * @return Carbon|boolean The beginning of the time period, or null.
      */
     public function spans($time_period)
     {
-        if (!array_key_exists($time_period, self::$time_periods)) {
-            throw new \InvalidArgumentException("Unsupported time period '$time_period'!");
-        }
+        $time_period = self::parseTimePeriod($time_period);
 
-        if (!$this->isBounded()) {
-            // If the date range does not have a bound then it will not span any time periods.
+        // If the date range does not have a bound then it will not span any time periods.
+        if (! $this->isBounded()) {
             return false;
         }
 
-        $start_of_period_func = 'startOf'.$time_period;
-        $end_of_period_func = 'endOf'.$time_period;
-
         // After must be positioned at the end of the time period
-        if (!$this->after->copy()->$end_of_period_func()->eq($this->after)) {
+        $end = self::forTimePeriod($time_period, $this->after)->end();
+        if (! $end->eq($this->after)) {
             return;
         }
 
         // Before must be positioned at the start of the time period
-        if (!$this->before->copy()->$start_of_period_func()->eq($this->before)) {
+        $start = self::forTimePeriod($time_period, $this->before)->start();
+        if (! $start->eq($this->before)) {
             return;
         }
 
-        // $after add a second should equal the beginning of the time period for $before sub one second.
-        if ($this->before->copy()->subSecond()->$start_of_period_func()->eq($this->after->copy()->addSecond())) {
-            return $this->after->copy()->addSecond();
-        } else {
+        // The start of the date range should equal the end of the date range set back to the start of its time period.
+        // This ensures that the range spans only a single time period; otherwise if we only checked the bounds, they
+        // could be two or more time periods apart.
+        if (! self::forTimePeriod($time_period, $this->end())->start()->eq($this->start())) {
             return;
         }
+
+        return $this->start();
     }
 
     /**

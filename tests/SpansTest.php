@@ -42,7 +42,7 @@ class SpansTest extends PHPUnit_Framework_TestCase
         $this->assertNull($range->spans(DateRange::DAY));
     }
 
-    public function test_extreme_values_dont_span_time_period___incorrect_position_late()
+    public function test_extreme_values_dont_span_time_period__incorrect_position_late()
     {
         $range = new DateRange(
             Carbon::now()->startOfDay(),
@@ -103,5 +103,38 @@ class SpansTest extends PHPUnit_Framework_TestCase
         $result = $range->spans(DateRange::YEAR);
         $this->assertEquals($expected, $result);
         $this->assertEquals($expected->timezone, $result->timezone);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Invalid time period
+     */
+    public function test_exception_is_thrown_if_time_period_is_not_supported() {
+        $range = new DateRange(
+            Carbon::now()->startOfYear()->subSecond(),
+            Carbon::now()->endOfYear()->addSecond()
+        );
+        $range->spans('FOO');
+    }
+
+    public function test_open_ended_ranges_return_null()
+    {
+        $range = new DateRange(Carbon::now()->startOfYear()->subSecond(), null);
+        $this->assertFalse($range->spans(DateRange::YEAR));
+    }
+
+    public function test_open_started_ranges_return_null()
+    {
+        $range = new DateRange(null, Carbon::now()->startOfYear()->subSecond());
+        $this->assertFalse($range->spans(DateRange::YEAR));
+    }
+
+    public function test_that_span_must_be_single_time_period()
+    {
+        $range = new DateRange(
+            Carbon::yesterday()->subSecond(),
+            Carbon::tomorrow()
+        );
+        $this->assertNull($range->spans(DateRange::DAY));
     }
 }
