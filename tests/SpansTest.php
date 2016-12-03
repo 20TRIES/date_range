@@ -51,6 +51,19 @@ class SpansTest extends PHPUnit_Framework_TestCase
         $this->assertNull($range->spans(DateRange::DAY));
     }
 
+    public function test_spans_hour()
+    {
+        $range = new DateRange(
+            Carbon::now()->minute(0)->second(0)->subSecond(1),
+            Carbon::now()->minute(59)->second(59)->addSecond(1)
+        );
+        $result = $range->spans(DateRange::HOUR);
+        $expected = Carbon::now()->minute(0)->second(0);
+        $this->assertInstanceOf(Carbon::class, $result);
+        $this->assertEquals($expected, $result);
+        $this->assertEquals($expected->timezone, $result->timezone);
+    }
+
     public function test_spans_day()
     {
         $range = new DateRange(
