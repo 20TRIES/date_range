@@ -7,11 +7,9 @@ use _20TRIES\Exceptions\TimezoneException;
 use Carbon\Carbon;
 
 /**
- * An object for storing and accessing a date range.
+ * A Date Range Object.
  *
- * @since   v0
- *
- * @author  Marcus T <marcust261@icloud.com>
+ * @property Carbon start
  */
 class DateRange
 {
