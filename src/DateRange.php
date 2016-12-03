@@ -5,11 +5,34 @@ namespace _20TRIES;
 use _20TRIES\Exceptions\DateRangeException;
 use _20TRIES\Exceptions\TimezoneException;
 use Carbon\Carbon;
+use InvalidArgumentException;
 
 /**
  * A Date Range Object.
  *
- * @property Carbon start
+ * @method DateRange thisHour($tz = 'GB')
+ * @method DateRange thisDay($tz = 'GB')
+ * @method DateRange thisWeek($tz = 'GB')
+ * @method DateRange thisMonth($tz = 'GB')
+ * @method DateRange thisYear($tz = 'GB')
+ *
+ * @method DateRange nextHour($tz = 'GB')
+ * @method DateRange nextDay($tz = 'GB')
+ * @method DateRange nextWeek($tz = 'GB')
+ * @method DateRange nextMonth($tz = 'GB')
+ * @method DateRange nextYear($tz = 'GB')
+ *
+ * @method DateRange lastHour($tz = 'GB')
+ * @method DateRange lastDay($tz = 'GB')
+ * @method DateRange lastWeek($tz = 'GB')
+ * @method DateRange lastMonth($tz = 'GB')
+ * @method DateRange lastYear($tz = 'GB')
+ *
+ * @method DateRange forHour($format, $date_time_string, $tz = 'GB')
+ * @method DateRange forDay($format, $date_time_string, $tz = 'GB')
+ * @method DateRange forWeek($format, $date_time_string, $tz = 'GB')
+ * @method DateRange forMonth($format, $date_time_string, $tz = 'GB')
+ * @method DateRange forYear($format, $date_time_string, $tz = 'GB')
  */
 class DateRange
 {
@@ -937,10 +960,17 @@ class DateRange
         return $date_time->gt($this->after) && $date_time->lt($this->before);
     }
 
+    /**
+     * Parses a time period provided as input.
+     *
+     * @param string $time_period
+     * @return string
+     * @throws InvalidArgumentException Invalid time period.
+     */
     protected static function parseTimePeriod($time_period)
     {
         if (! array_key_exists($time_period, self::$time_periods)) {
-            throw new \InvalidArgumentException("Invalid time period.");
+            throw new InvalidArgumentException("Invalid time period");
         }
         return $time_period;
     }
