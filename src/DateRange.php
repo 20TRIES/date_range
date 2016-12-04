@@ -96,6 +96,15 @@ class DateRange
      */
     public static $time_periods = [self::DAY => self::DAY, self::WEEK => self::WEEK, self::MONTH => self::MONTH, self::YEAR => self::YEAR, self::HOUR => self::HOUR];
 
+    /**
+     * @var array Static method aliases that are available for use within the class.
+     */
+    protected static $dynamic_method_aliases = [
+        'today'     => 'thisDay',
+        'tomorrow'  => 'nextDay',
+        'yesterday' => 'lastDay',
+    ];
+
     protected $timeperiod_formats = [
         self::DAY   => 'l',
         self::WEEK  => '\W\e\ek \S\t\a\r\t\i\n\g dS M',
@@ -146,19 +155,8 @@ class DateRange
      */
     public static function __callStatic($method, $args)
     {
+        $method = array_key_exists($method, self::$dynamic_method_aliases) ? self::$dynamic_method_aliases[$method] : $method;
         $prefix = preg_replace('/[A-Z].*/', '', $method);
-
-        if (in_array($prefix, ['today', 'tomorrow', 'yesterday'])) {
-            if ($prefix === 'tomorrow') {
-                $prefix = 'next';
-            } elseif($prefix === 'yesterday') {
-                $prefix = 'last';
-            } else {
-                $prefix = 'this';
-            }
-            $method = "{$prefix}Day";
-        }
-
         $time_period = substr($method, strlen($prefix));
 
         // If the method is prefixed with this, next or last and the postfix is a valid timestamp, then we will attempt
