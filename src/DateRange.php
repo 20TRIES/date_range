@@ -10,29 +10,29 @@ use InvalidArgumentException;
 /**
  * A Date Range Object.
  *
- * @method DateRange thisHour($tz = 'GB')
- * @method DateRange thisDay($tz = 'GB')
- * @method DateRange thisWeek($tz = 'GB')
- * @method DateRange thisMonth($tz = 'GB')
- * @method DateRange thisYear($tz = 'GB')
+ * @method static DateRange thisHour($tz = 'GB')
+ * @method static DateRange thisDay($tz = 'GB')
+ * @method static DateRange thisWeek($tz = 'GB')
+ * @method static DateRange thisMonth($tz = 'GB')
+ * @method static DateRange thisYear($tz = 'GB')
  *
- * @method DateRange nextHour($tz = 'GB')
- * @method DateRange nextDay($tz = 'GB')
- * @method DateRange nextWeek($tz = 'GB')
- * @method DateRange nextMonth($tz = 'GB')
- * @method DateRange nextYear($tz = 'GB')
+ * @method static DateRange nextHour($tz = 'GB')
+ * @method static DateRange nextDay($tz = 'GB')
+ * @method static DateRange nextWeek($tz = 'GB')
+ * @method static DateRange nextMonth($tz = 'GB')
+ * @method static DateRange nextYear($tz = 'GB')
  *
- * @method DateRange lastHour($tz = 'GB')
- * @method DateRange lastDay($tz = 'GB')
- * @method DateRange lastWeek($tz = 'GB')
- * @method DateRange lastMonth($tz = 'GB')
- * @method DateRange lastYear($tz = 'GB')
+ * @method static DateRange lastHour($tz = 'GB')
+ * @method static DateRange lastDay($tz = 'GB')
+ * @method static DateRange lastWeek($tz = 'GB')
+ * @method static DateRange lastMonth($tz = 'GB')
+ * @method static DateRange lastYear($tz = 'GB')
  *
- * @method DateRange forHour($format, $date_time_string, $tz = 'GB')
- * @method DateRange forDay($format, $date_time_string, $tz = 'GB')
- * @method DateRange forWeek($format, $date_time_string, $tz = 'GB')
- * @method DateRange forMonth($format, $date_time_string, $tz = 'GB')
- * @method DateRange forYear($format, $date_time_string, $tz = 'GB')
+ * @method static DateRange forHour($format, $date_time_string, $tz = 'GB')
+ * @method static DateRange forDay($format, $date_time_string, $tz = 'GB')
+ * @method static DateRange forWeek($format, $date_time_string, $tz = 'GB')
+ * @method static DateRange forMonth($format, $date_time_string, $tz = 'GB')
+ * @method static DateRange forYear($format, $date_time_string, $tz = 'GB')
  */
 class DateRange
 {
@@ -96,6 +96,15 @@ class DateRange
      */
     public static $time_periods = [self::DAY => self::DAY, self::WEEK => self::WEEK, self::MONTH => self::MONTH, self::YEAR => self::YEAR, self::HOUR => self::HOUR];
 
+    /**
+     * @var array Static method aliases that are available for use within the class.
+     */
+    protected static $dynamic_method_aliases = [
+        'today'     => 'thisDay',
+        'tomorrow'  => 'nextDay',
+        'yesterday' => 'lastDay',
+    ];
+
     protected $timeperiod_formats = [
         self::DAY   => 'l',
         self::WEEK  => '\W\e\ek \S\t\a\r\t\i\n\g dS M',
@@ -138,23 +147,54 @@ class DateRange
     }
 
     /**
-     * Gets the timezone for a date range.
+     * Handles unknown method calls.
      *
-     * @return \DateTimeZone|null
+     * @param string $method
+     * @param array $args
+     * @return static|null
      */
-    public function getTimezone()
+    public static function __callStatic($method, $args)
     {
-        return $this->timezone;
-    }
+        $method = array_key_exists($method, self::$dynamic_method_aliases) ? self::$dynamic_method_aliases[$method] : $method;
+        $prefix = preg_replace('/[A-Z].*/', '', $method);
+        $time_period = substr($method, strlen($prefix));
 
-    public static function before(Carbon $date_time)
-    {
-        return new static(null, $date_time);
-    }
+        // If the method is prefixed with this, next or last and the postfix is a valid timestamp, then we will attempt
+        // to generate a date range for the given time period.
+        if (in_array($prefix, ['this', 'next', 'last', 'for']) && in_array($time_period, self::$time_periods)) {
+            $time_period = self::parseTimePeriod($time_period);
 
-    public static function after(Carbon $date_time)
-    {
-        return new static($date_time, null);
+            // Create a date time instance from the input provided.
+            if ($prefix === 'for') {
+                $date_time = Carbon::createFromFormat(
+                    $args[0],
+                    $args[1],
+                    array_key_exists(2, $args) ? $args[2] : 'GB'
+                );
+            } else {
+                $date_time = Carbon::now($args[0]);
+            }
+
+            // Offset the date time according to the language used in the method call.
+            $date_time = $time_period === self::HOUR
+                ? $date_time->minute(0)->second(0)
+                : $date_time->{"startOf{$time_period}"}();
+
+            // Generate a date range.
+            switch ($prefix) {
+                case "for":
+                case "this":
+                    return self::forTimePeriod($time_period, $date_time);
+                case "next":
+                    return self::forTimePeriod($time_period, $date_time->{"add{$time_period}"}());
+                case "last":
+                    return self::forTimePeriod($time_period, $date_time->{"sub{$time_period}"}());
+            }
+        }
+
+        $trace = debug_backtrace();
+        trigger_error("Undefined method via __callStatic(): {$method} in {$trace[0]['file']} on line {$trace[0]['line']}", E_USER_NOTICE);
+        return null;
     }
 
     /**
@@ -175,7 +215,7 @@ class DateRange
      *
      * @param string $time_period
      * @param Carbon $date_time
-     * @return DateRange
+     * @return static
      */
     public static function forTimePeriod($time_period, Carbon $date_time)
     {
@@ -195,195 +235,23 @@ class DateRange
     }
 
     /**
-     * Creates a date range that spans the current hour.
+     * Gets the timezone for a date range.
      *
-     * @param null $tz
-     * @return DateRange
+     * @return \DateTimeZone|null
      */
-    public static function thisHour($tz = null)
+    public function getTimezone()
     {
-        return self::forTimePeriod(self::HOUR, Carbon::now($tz));
+        return $this->timezone;
     }
 
-    /**
-     * Creates a date range that spans the previous hour.
-     *
-     * @param null $tz
-     * @return DateRange
-     */
-    public static function lastHour($tz = null)
+    public static function before(Carbon $date_time)
     {
-        return self::forTimePeriod(self::HOUR, Carbon::now($tz)->subHour());
+        return new static(null, $date_time);
     }
 
-    /**
-     * Creates a date range that spans the next hour.
-     *
-     * @param null $tz
-     * @return DateRange
-     */
-    public static function nextHour($tz = null)
+    public static function after(Carbon $date_time)
     {
-        return self::forTimePeriod(self::HOUR, Carbon::now($tz)->addHour());
-    }
-
-    /**
-     * Creates a date range that spans tomorrow.
-     *
-     * @param string $tz
-     *
-     * @return DateRange
-     */
-    public static function tomorrow($tz = 'GB')
-    {
-        return self::forTimePeriod(self::DAY, Carbon::tomorrow($tz));
-    }
-
-    /**
-     * Creates a date range that spans today.
-     *
-     * @param string $tz
-     *
-     * @return DateRange
-     */
-    public static function today($tz = 'GB')
-    {
-        return self::forTimePeriod(self::DAY, Carbon::today($tz));
-    }
-
-    /**
-     * Creates a date range that spans yesterday.
-     *
-     * @param string $tz
-     *
-     * @return DateRange
-     */
-    public static function yesterday($tz = 'GB')
-    {
-        return self::forTimePeriod(self::DAY, Carbon::yesterday($tz));
-    }
-
-    /**
-     * Creates a date range that spans next week.
-     *
-     * @param string $tz
-     *
-     * @return DateRange
-     */
-    public static function nextWeek($tz = 'GB')
-    {
-        return self::forTimePeriod(self::WEEK, Carbon::now($tz)->addWeek());
-    }
-
-    /**
-     * Creates a date range that spans this week.
-     *
-     * @param string $tz
-     *
-     * @return DateRange
-     */
-    public static function thisWeek($tz = 'GB')
-    {
-        return self::forTimePeriod(self::WEEK, Carbon::now($tz));
-    }
-
-    /**
-     * Creates a date range that spans the last week.
-     *
-     * @param string $tz
-     *
-     * @return DateRange
-     */
-    public static function lastWeek($tz = 'GB')
-    {
-        return self::forTimePeriod(self::WEEK, Carbon::now($tz)->subWeek());
-    }
-
-    /**
-     * Creates a date range that spans next month.
-     *
-     * @param string $tz
-     *
-     * @return static
-     */
-    public static function nextMonth($tz = 'GB')
-    {
-        return self::forTimePeriod(self::MONTH, Carbon::now($tz)->startOfMonth()->addMonth());
-    }
-
-    /**
-     * Creates a date range that spans this month.
-     *
-     * @param string $tz
-     *
-     * @return static
-     */
-    public static function thisMonth($tz = 'GB')
-    {
-        return self::forTimePeriod(self::MONTH, Carbon::now($tz));
-    }
-
-    /**
-     * Creates a date range that spans last month.
-     *
-     * @param string $tz
-     *
-     * @return static
-     */
-    public static function lastMonth($tz = 'GB')
-    {
-        return self::forTimePeriod(self::MONTH, Carbon::now($tz)->startOfMonth()->subMonth());
-    }
-
-    /**
-     * Creates a date range that spans a month, using the month taken from a date / time string and
-     * a given format.
-     *
-     * @param string $format
-     * @param string $time
-     * @param string $tz
-     *
-     * @return DateRange
-     */
-    public static function forMonth($format, $time, $tz = 'GB')
-    {
-        return self::forTimePeriod(self::MONTH, Carbon::createFromFormat($format, $time, $tz)->startOfMonth());
-    }
-
-    /**
-     * Creates a date range that spans next year.
-     *
-     * @param string $tz
-     *
-     * @return statics
-     */
-    public static function nextYear($tz = 'GB')
-    {
-        return self::forTimePeriod(self::YEAR, Carbon::today($tz)->startOfYear()->addYear());
-    }
-
-    /**
-     * Creates a date range that spans this year.
-     *
-     * @param string $tz
-     *
-     * @return static
-     */
-    public static function thisYear($tz = 'GB')
-    {
-        return self::forTimePeriod(self::YEAR, Carbon::today($tz));
-    }
-
-    /**
-     * Creates a date range that spans last year.
-     *
-     * @param string $tz
-     *
-     * @return static
-     */
-    public static function lastYear($tz = 'GB')
-    {
-        return self::forTimePeriod(self::YEAR, Carbon::today($tz)->startOfYear()->subYear());
+        return new static($date_time, null);
     }
 
     /**
