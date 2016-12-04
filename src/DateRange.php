@@ -10,29 +10,29 @@ use InvalidArgumentException;
 /**
  * A Date Range Object.
  *
- * @method DateRange thisHour($tz = 'GB')
- * @method DateRange thisDay($tz = 'GB')
- * @method DateRange thisWeek($tz = 'GB')
- * @method DateRange thisMonth($tz = 'GB')
- * @method DateRange thisYear($tz = 'GB')
+ * @method static DateRange thisHour($tz = 'GB')
+ * @method static DateRange thisDay($tz = 'GB')
+ * @method static DateRange thisWeek($tz = 'GB')
+ * @method static DateRange thisMonth($tz = 'GB')
+ * @method static DateRange thisYear($tz = 'GB')
  *
- * @method DateRange nextHour($tz = 'GB')
- * @method DateRange nextDay($tz = 'GB')
- * @method DateRange nextWeek($tz = 'GB')
- * @method DateRange nextMonth($tz = 'GB')
- * @method DateRange nextYear($tz = 'GB')
+ * @method static DateRange nextHour($tz = 'GB')
+ * @method static DateRange nextDay($tz = 'GB')
+ * @method static DateRange nextWeek($tz = 'GB')
+ * @method static DateRange nextMonth($tz = 'GB')
+ * @method static DateRange nextYear($tz = 'GB')
  *
- * @method DateRange lastHour($tz = 'GB')
- * @method DateRange lastDay($tz = 'GB')
- * @method DateRange lastWeek($tz = 'GB')
- * @method DateRange lastMonth($tz = 'GB')
- * @method DateRange lastYear($tz = 'GB')
+ * @method static DateRange lastHour($tz = 'GB')
+ * @method static DateRange lastDay($tz = 'GB')
+ * @method static DateRange lastWeek($tz = 'GB')
+ * @method static DateRange lastMonth($tz = 'GB')
+ * @method static DateRange lastYear($tz = 'GB')
  *
- * @method DateRange forHour($format, $date_time_string, $tz = 'GB')
- * @method DateRange forDay($format, $date_time_string, $tz = 'GB')
- * @method DateRange forWeek($format, $date_time_string, $tz = 'GB')
- * @method DateRange forMonth($format, $date_time_string, $tz = 'GB')
- * @method DateRange forYear($format, $date_time_string, $tz = 'GB')
+ * @method static DateRange forHour($format, $date_time_string, $tz = 'GB')
+ * @method static DateRange forDay($format, $date_time_string, $tz = 'GB')
+ * @method static DateRange forWeek($format, $date_time_string, $tz = 'GB')
+ * @method static DateRange forMonth($format, $date_time_string, $tz = 'GB')
+ * @method static DateRange forYear($format, $date_time_string, $tz = 'GB')
  */
 class DateRange
 {
@@ -142,16 +142,17 @@ class DateRange
      *
      * @param string $method
      * @param array $args
-     * @return DateRange|null
+     * @return static|null
      */
     public static function __callStatic($method, $args)
     {
-        $prefix = substr($method, 0, 4);
+        $prefix = preg_replace('/[A-Z].*/', '', $time);
+        $time_period = substr($time, strlen($prefix));
 
         // If the method is prefixed with this, next or last and the postfix is a valid timestamp, then we will attempt
         // to generate a date range for the given time period.
-        if (in_array($prefix, ['this', 'next', 'last', 'for']) && in_array(substr($method, 4), self::$time_periods)) {
-            $time_period = self::parseTimePeriod(substr($method, 4));
+        if (in_array($prefix, ['this', 'next', 'last', 'for']) && in_array($time_period, self::$time_periods)) {
+            $time_period = self::parseTimePeriod($time_period);
 
             // Create a date time instance from the input provided.
             if ($prefix === 'for') {
@@ -204,7 +205,7 @@ class DateRange
      *
      * @param string $time_period
      * @param Carbon $date_time
-     * @return DateRange
+     * @return static
      */
     public static function forTimePeriod($time_period, Carbon $date_time)
     {
