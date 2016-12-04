@@ -146,8 +146,20 @@ class DateRange
      */
     public static function __callStatic($method, $args)
     {
-        $prefix = preg_replace('/[A-Z].*/', '', $time);
-        $time_period = substr($time, strlen($prefix));
+        $prefix = preg_replace('/[A-Z].*/', '', $method);
+
+        if (in_array($prefix, ['today', 'tomorrow', 'yesterday'])) {
+            if ($prefix === 'tomorrow') {
+                $prefix = 'next';
+            } elseif($prefix === 'yesterday') {
+                $prefix = 'last';
+            } else {
+                $prefix = 'this';
+            }
+            $method = "{$prefix}Day";
+        }
+
+        $time_period = substr($method, strlen($prefix));
 
         // If the method is prefixed with this, next or last and the postfix is a valid timestamp, then we will attempt
         // to generate a date range for the given time period.
@@ -222,42 +234,6 @@ class DateRange
                     $date_time->copy()->{"endOf{$time_period}"}()
                 );
         }
-    }
-
-    /**
-     * Creates a date range that spans tomorrow.
-     *
-     * @param string $tz
-     *
-     * @return DateRange
-     */
-    public static function tomorrow($tz = 'GB')
-    {
-        return self::forTimePeriod(self::DAY, Carbon::tomorrow($tz));
-    }
-
-    /**
-     * Creates a date range that spans today.
-     *
-     * @param string $tz
-     *
-     * @return DateRange
-     */
-    public static function today($tz = 'GB')
-    {
-        return self::forTimePeriod(self::DAY, Carbon::today($tz));
-    }
-
-    /**
-     * Creates a date range that spans yesterday.
-     *
-     * @param string $tz
-     *
-     * @return DateRange
-     */
-    public static function yesterday($tz = 'GB')
-    {
-        return self::forTimePeriod(self::DAY, Carbon::yesterday($tz));
     }
 
     /**
