@@ -28,6 +28,10 @@ use InvalidArgumentException;
  * @method static DateRange lastMonth($tz = 'GB')
  * @method static DateRange lastYear($tz = 'GB')
  *
+ * @method static DateRange today($tz = 'GB')
+ * @method static DateRange tomorrow($tz = 'GB')
+ * @method static DateRange yesterday($tz = 'GB')
+ *
  * @method static DateRange forHour($format, $date_time_string, $tz = 'GB')
  * @method static DateRange forDay($format, $date_time_string, $tz = 'GB')
  * @method static DateRange forWeek($format, $date_time_string, $tz = 'GB')
