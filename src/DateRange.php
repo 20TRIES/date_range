@@ -652,12 +652,10 @@ class DateRange
                 $new_dates[$date_name] = $this->$date_name->copy()->$offset_method();
             }
 
-            // Make any position adjustments that are necessary. If a date is positioned at the
-            // start or end of a time period then we will adjust any offset dates to be at the
-            // start and end of the new time period.
-            if (!is_null($original_dates[$date_name]['position']) && $keep_position) {
-                $method = $original_dates[$date_name]['position']."of$time_period";
-                $new_dates[$date_name]->$method();
+            // If a date is positioned at the start or end of a time period then we will adjust any offset dates to be
+            // at the start and end of the new time period.
+            if (! is_null($original_dates[$date_name]['position']) && $keep_position) {
+                $new_dates[$date_name] = self::forTimePeriod($time_period, $new_dates[$date_name])->{$original_dates[$date_name]['position']}();
             }
         }
 
