@@ -28,6 +28,10 @@ use InvalidArgumentException;
  * @method static DateRange lastMonth($tz = 'GB')
  * @method static DateRange lastYear($tz = 'GB')
  *
+ * @method static DateRange today($tz = 'GB')
+ * @method static DateRange tomorrow($tz = 'GB')
+ * @method static DateRange yesterday($tz = 'GB')
+ *
  * @method static DateRange forHour($format, $date_time_string, $tz = 'GB')
  * @method static DateRange forDay($format, $date_time_string, $tz = 'GB')
  * @method static DateRange forWeek($format, $date_time_string, $tz = 'GB')
@@ -172,7 +176,7 @@ class DateRange
                     array_key_exists(2, $args) ? $args[2] : 'GB'
                 );
             } else {
-                $date_time = Carbon::now($args[0]);
+                $date_time = Carbon::now(array_key_exists(0, $args) ? $args[0] : 'GB');
             }
 
             // Offset the date time according to the language used in the method call.
@@ -648,12 +652,10 @@ class DateRange
                 $new_dates[$date_name] = $this->$date_name->copy()->$offset_method();
             }
 
-            // Make any position adjustments that are necessary. If a date is positioned at the
-            // start or end of a time period then we will adjust any offset dates to be at the
-            // start and end of the new time period.
-            if (!is_null($original_dates[$date_name]['position']) && $keep_position) {
-                $method = $original_dates[$date_name]['position']."of$time_period";
-                $new_dates[$date_name]->$method();
+            // If a date is positioned at the start or end of a time period then we will adjust any offset dates to be
+            // at the start and end of the new time period.
+            if (! is_null($original_dates[$date_name]['position']) && $keep_position) {
+                $new_dates[$date_name] = self::forTimePeriod($time_period, $new_dates[$date_name])->{$original_dates[$date_name]['position']}();
             }
         }
 
