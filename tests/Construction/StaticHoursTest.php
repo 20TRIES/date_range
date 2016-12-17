@@ -4,7 +4,7 @@ use _20TRIES\DateRange;
 use Carbon\Carbon;
 use PHPUnit_Framework_TestCase;
 
-class HourConstructionTest extends PHPUnit_Framework_TestCase
+class StaticHoursTest extends PHPUnit_Framework_TestCase
 {
     public function test_this_hour()
     {
@@ -22,6 +22,14 @@ class HourConstructionTest extends PHPUnit_Framework_TestCase
         $before = $range->getBefore();
         $this->assertAttributeEquals($expected_before, 'before', $range);
         $this->assertEquals($expected_before, $before);
+    }
+
+    public function test_timezone_is_optional_for_thisHour()
+    {
+        $range = DateRange::thisHour();
+        $expected_timezone = 'GB';
+        $this->assertAttributeEquals($expected_timezone, 'timezone', $range->getAfter());
+        $this->assertAttributeEquals($expected_timezone, 'timezone', $range->getBefore());
     }
 
     public function test_next_hour()
@@ -42,6 +50,14 @@ class HourConstructionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expected_before, $before);
     }
 
+    public function test_timezone_is_optional_for_nextHour()
+    {
+        $range = DateRange::nextHour();
+        $expected_timezone = 'GB';
+        $this->assertAttributeEquals($expected_timezone, 'timezone', $range->getAfter());
+        $this->assertAttributeEquals($expected_timezone, 'timezone', $range->getBefore());
+    }
+
     public function test_last_hour()
     {
         $range = DateRange::lastHour($expected_timezone = 'UTC');
@@ -58,5 +74,13 @@ class HourConstructionTest extends PHPUnit_Framework_TestCase
         $before = $range->getBefore();
         $this->assertAttributeEquals($expected_before, 'before', $range);
         $this->assertEquals($expected_before, $before);
+    }
+
+    public function test_timezone_is_optional_for_lastHour()
+    {
+        $range = DateRange::lastHour();
+        $expected_timezone = 'GB';
+        $this->assertAttributeEquals($expected_timezone, 'timezone', $range->getAfter());
+        $this->assertAttributeEquals($expected_timezone, 'timezone', $range->getBefore());
     }
 }

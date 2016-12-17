@@ -23,6 +23,14 @@ class StaticDaysTest extends PHPUnit_Framework_TestCase
         $this->assertAttributeEquals($expected_timezone, 'timezone', $range->getBefore());
     }
 
+    public function test_timezone_is_optional_for_today()
+    {
+        $range = DateRange::today();
+        $expected_timezone = 'GB';
+        $this->assertAttributeEquals($expected_timezone, 'timezone', $range->getAfter());
+        $this->assertAttributeEquals($expected_timezone, 'timezone', $range->getBefore());
+    }
+
     public function test_tomorrow()
     {
         $range = DateRange::tomorrow($expected_timezone = 'UTC');
@@ -42,6 +50,14 @@ class StaticDaysTest extends PHPUnit_Framework_TestCase
         $this->assertAttributeEquals($expected_timezone, 'timezone', $range->getBefore());
     }
 
+    public function test_timezone_is_optional_for_tomorrow()
+    {
+        $range = DateRange::tomorrow();
+        $expected_timezone = 'GB';
+        $this->assertAttributeEquals($expected_timezone, 'timezone', $range->getAfter());
+        $this->assertAttributeEquals($expected_timezone, 'timezone', $range->getBefore());
+    }
+
     public function test_yesterday()
     {
         $range = DateRange::yesterday($expected_timezone = 'UTC');
@@ -58,6 +74,14 @@ class StaticDaysTest extends PHPUnit_Framework_TestCase
         $expected_before = $yesterday->copy()->endOfDay()->addSecond();
         $this->assertAttributeInstanceOf(Carbon::class, 'before', $range);
         $this->assertAttributeEquals($expected_before, 'before', $range);
+        $this->assertAttributeEquals($expected_timezone, 'timezone', $range->getBefore());
+    }
+
+    public function test_timezone_is_optional_for_yesterday()
+    {
+        $range = DateRange::yesterday();
+        $expected_timezone = 'GB';
+        $this->assertAttributeEquals($expected_timezone, 'timezone', $range->getAfter());
         $this->assertAttributeEquals($expected_timezone, 'timezone', $range->getBefore());
     }
 }

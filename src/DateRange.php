@@ -176,7 +176,7 @@ class DateRange
                     array_key_exists(2, $args) ? $args[2] : 'GB'
                 );
             } else {
-                $date_time = Carbon::now($args[0]);
+                $date_time = Carbon::now(array_key_exists(0, $args) ? $args[0] : 'GB');
             }
 
             // Offset the date time according to the language used in the method call.

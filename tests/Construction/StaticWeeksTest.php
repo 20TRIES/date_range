@@ -25,6 +25,14 @@ class StaticWeeksTest extends PHPUnit_Framework_TestCase
         $this->assertAttributeEquals($expected_timezone, 'timezone', $range->getBefore());
     }
 
+    public function test_timezone_is_optional_for_thisWeek()
+    {
+        $range = DateRange::thisWeek();
+        $expected_timezone = 'GB';
+        $this->assertAttributeEquals($expected_timezone, 'timezone', $range->getAfter());
+        $this->assertAttributeEquals($expected_timezone, 'timezone', $range->getBefore());
+    }
+
     public function test_next_week()
     {
         $range = DateRange::nextWeek($expected_timezone = 'UTC');
@@ -44,6 +52,14 @@ class StaticWeeksTest extends PHPUnit_Framework_TestCase
         $this->assertAttributeEquals($expected_timezone, 'timezone', $range->getBefore());
     }
 
+    public function test_timezone_is_optional_for_nextWeek()
+    {
+        $range = DateRange::nextWeek();
+        $expected_timezone = 'GB';
+        $this->assertAttributeEquals($expected_timezone, 'timezone', $range->getAfter());
+        $this->assertAttributeEquals($expected_timezone, 'timezone', $range->getBefore());
+    }
+
     public function test_last_week()
     {
         $range = DateRange::lastWeek($expected_timezone = 'UTC');
@@ -60,6 +76,14 @@ class StaticWeeksTest extends PHPUnit_Framework_TestCase
         $expected_before = $expected_start->copy()->endOfWeek()->addSecond();
         $this->assertAttributeInstanceOf(Carbon::class, 'before', $range);
         $this->assertAttributeEquals($expected_before, 'before', $range);
+        $this->assertAttributeEquals($expected_timezone, 'timezone', $range->getBefore());
+    }
+
+    public function test_timezone_is_optional_for_lastWeek()
+    {
+        $range = DateRange::lastWeek();
+        $expected_timezone = 'GB';
+        $this->assertAttributeEquals($expected_timezone, 'timezone', $range->getAfter());
         $this->assertAttributeEquals($expected_timezone, 'timezone', $range->getBefore());
     }
 }
